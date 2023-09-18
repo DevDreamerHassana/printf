@@ -1,60 +1,104 @@
 #include "main.h"
 
-void print_buffer(char buffer[], int *buff_ind);
-
 /**
- * _printf - Custom printf function
+ * _printf - Produces output according to a format
  * @format: The format string
- * Return: The number of characters printed
+ * @...: The variable arguments
+ *
+ * Return: The number of characters printed, or -1 on error
  */
 int _printf(const char *format, ...)
 {
-	int printed_chars = 0;
-	int buff_ind = 0;
-	va_list list;
-	char buffer[BUFF_SIZE];
+	int i = 0;
+	va_list argument;
 
-	if (format == NULL)
+	va_start(argument, format);
+
+	if (!format || (format[0] == '%' && format[1] == '\0'))
 		return (-1);
 
-	va_start(list, format);
-
-	for (int i = 0; format[i] != '\0'; i++)
+	while (*format)
 	{
-		if (format[i] != '%')
+		if (*format == '%')
 		{
-			buffer[buff_ind++] = format[i];
-			if (buff_ind == BUFF_SIZE)
-				print_buffer(buffer, &buff_ind);
-			printed_chars++;
+			format++;
+			if (*format == '%')
+			{
+				_putchar('%');
+				i++;
+			}
+			else if (*format == 'd' || *format == 'i')
+			{
+				int num = va_arg(argument, int);
+
+				if (num == 0)
+				{
+					_putchar('0');
+					i++;
+				}
+				else
+				{
+					i += print_id(num);
+				}
+			}
+			else if (*format == 'c')
+			{
+				_putchar(va_arg(argument, int));
+				i++;
+			}
+			else if (*format == 's')
+			{
+				char *str = va_arg(argument, char *);
+
+				if (str == NULL)
+				{
+					print_string("(null)");
+					i += 6;
+				}
+				else
+				{
+					i += print_string(str);
+				}
+			}
+			else if (*format == 'b')
+			{
+				unsigned int num = va_arg(argument, unsigned int);
+
+				i += print_binary(num);
+			}
+			else if (*format == 'r')
+			{
+				char *str = va_arg(argument, char *);
+				int len = my_strlen(str);
+
+				for (int j = len - 1; j >= 0; j--)
+				{
+					_putchar(str[j]);
+					i++;
+				}
+			}
+			else if (*format == 'R')
+			{
+				char *str = va_arg(argument, char *);
+				char *rot_str = rot13(str);
+
+				i += print_string(rot_str);
+			}
+			else
+			{
+				_putchar('%');
+				_putchar(*format);
+				i += 2;
+			}
 		}
 		else
 		{
-			print_buffer(buffer, &buff_ind);
+			_putchar(*format);
 			i++;
-			if (format[i] == '\0')
-				return (-1);
-			handle_format(format, &i, list, buffer, &printed_chars);
 		}
+		format++;
 	}
-
-	print_buffer(buffer, &buff_ind);
-
-	va_end(list);
-
-	return (printed_chars);
-}
-
-/**
- * print_buffer - Prints the contents of the buffer
- * @buffer: The character buffer
- * @buff_ind: Pointer to the buffer index
- */
-void print_buffer(char buffer[], int *buff_ind)
-{
-	if (*buff_ind > 0)
-		write(1, buffer, *buff_ind);
-
-	*buff_ind = 0;
+	va_end(argument);
+	return (i);
 }
 
