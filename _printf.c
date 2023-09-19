@@ -1,11 +1,12 @@
 #include "main.h"
-
+int print_binary(unsigned int num);
+int print_id(int num);
+int print_string(char *str);
 /**
- * _printf - Produces output according to a format
- * @format: The format string
+ * _printf - produces output according to a format
+ * @format: The format string.
  * @...: The variable arguments
- *
- * Return: The number of characters printed, or -1 on error
+ * Return: The number of characters printed, or -1 on error.
  */
 int _printf(const char *format, ...)
 {
@@ -64,14 +65,15 @@ int _printf(const char *format, ...)
 			{
 				unsigned int num = va_arg(argument, unsigned int);
 
-				i += print_binary(num);
+				return (print_binary(num));
 			}
 			else if (*format == 'r')
 			{
 				char *str = va_arg(argument, char *);
 				int len = my_strlen(str);
+				int j;
 
-				for (int j = len - 1; j >= 0; j--)
+				for (j = len - 1; j >= 0; j--)
 				{
 					_putchar(str[j]);
 					i++;
